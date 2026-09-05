@@ -1,0 +1,21 @@
+{
+  "name": "রক্তদান প্রো",
+  "short_name": "রক্তদান",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#dc2626",
+  "description": "জরুরি রক্ত সেবা ও রক্তদাতা অনুসন্ধান প্ল্যাটফর্ম",
+  "icons": [
+    {
+      "src": "https://lh3.googleusercontent.com/d/1_cRfZ3IeCWXrd2j0AqbbSVXaEqsbCRtf",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://lh3.googleusercontent.com/d/1_cRfZ3IeCWXrd2j0AqbbSVXaEqsbCRtf",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
