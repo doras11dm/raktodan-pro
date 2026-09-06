@@ -1,7 +1,9 @@
 {
+   "id": "/user-app-raktodan",
   "name": "রক্তদান প্রো",
   "short_name": "রক্তদান",
   "start_url": "./index.html",
+  "scope": "./index.html",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#dc2626",
