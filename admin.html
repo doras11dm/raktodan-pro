@@ -26,13 +26,13 @@
 </head>
 <body id="admin-body" class="bg-slate-950 text-slate-100 flex justify-center items-center h-screen overflow-hidden transition-colors duration-300">
 
-    <!-- Mobile-First Responsive Standalone Container -->
+    <!-- Standalone Container -->
     <div id="admin-container" class="w-full max-w-4xl bg-slate-900 h-full sm:h-[94vh] flex flex-col rounded-none sm:rounded-[2.5xl] shadow-2xl border-0 sm:border-[8px] sm:border-slate-800 overflow-hidden transition-colors duration-300">
         
-        <!-- Header with Theme Switcher, Refresh & Notification Bell -->
+        <!-- Header -->
         <header id="admin-header" class="bg-slate-900 px-4 sm:px-5 py-3.5 flex justify-between items-center border-b border-slate-800 shrink-0 transition-colors duration-300">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="refreshCurrentAdminTab()">
-                <div class="bg-red-600 text-white w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg shadow-red-600/30">
+                <div class="bg-gradient-to-tr from-red-600 to-rose-500 text-white w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg shadow-red-600/30">
                     <i class="fa-solid fa-shield-halved text-base"></i>
                 </div>
                 <div>
@@ -42,37 +42,32 @@
             </div>
 
             <div class="flex items-center space-x-1.5 sm:space-x-2">
-                <!-- গ্লোবাল রিফ্রেশ বাটন -->
                 <button onclick="refreshCurrentAdminTab()" id="global-refresh-btn" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-xs transition" title="ডাটা রিফ্রেশ করুন">
                     <i class="fa-solid fa-rotate-right"></i>
                 </button>
 
-                <!-- নোটিফিকেশন বেল বাটন (কাউন্টার সহ) -->
                 <button onclick="openAdminNotificationModal()" class="relative w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 flex items-center justify-center text-xs transition" title="ইউজার রিকোয়েস্ট নোটিফিকেশন">
                     <i class="fa-solid fa-bell"></i>
                     <span id="admin-notif-badge" class="hidden absolute -top-1 -right-1 bg-red-600 text-white text-[9px] font-black w-4 h-4 rounded-full items-center justify-center shadow-lg animate-pulse">0</span>
                 </button>
 
-                <!-- লাইট/ডার্ক মোড টগল বাটন -->
                 <button onclick="toggleAdminTheme()" id="theme-toggle-btn" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 flex items-center justify-center text-sm transition" title="মোড পরিবর্তন">
                     <i class="fa-solid fa-sun"></i>
                 </button>
 
-                <!-- লগআউট বাটন -->
                 <button id="admin-logout-btn" onclick="handleAdminLogout()" class="hidden w-9 h-9 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 border border-rose-500/20 items-center justify-center text-sm transition" title="লগআউট">
                     <i class="fa-solid fa-right-from-bracket"></i>
                 </button>
             </div>
         </header>
 
-        <!-- Main Screen (Dynamic Login or Dashboard) -->
+        <!-- Main Screen -->
         <main id="admin-screen" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
-            <!-- Content will be rendered by JS -->
+            <!-- Content Rendered by JS -->
         </main>
-
     </div>
 
-    <!-- ১. ইন-অ্যাপ কাস্টম অ্যালার্ট পপআপ মডাল (No Native Alert) -->
+    <!-- কাস্টম অ্যালার্ট মডাল -->
     <div id="admin-custom-alert-modal" class="hidden fixed inset-0 z-50 flex justify-center items-center p-4 bg-black/70 backdrop-blur-sm">
         <div class="bg-slate-900 border border-slate-800 w-full max-w-xs p-5 rounded-3xl text-center space-y-3.5 shadow-2xl animate-custom-popup">
             <div id="admin-alert-icon-container" class="w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl shadow-inner bg-red-500/10 text-red-500">
@@ -88,7 +83,7 @@
         </div>
     </div>
 
-    <!-- ২. ইন-অ্যাপ কাস্টম কনফার্ম পপআপ মডাল (No Native Confirm) -->
+    <!-- কাস্টম কনফার্ম মডাল -->
     <div id="admin-custom-confirm-modal" class="hidden fixed inset-0 z-50 flex justify-center items-center p-4 bg-black/70 backdrop-blur-sm">
         <div class="bg-slate-900 border border-slate-800 w-full max-w-xs p-5 rounded-3xl text-center space-y-3.5 shadow-2xl animate-custom-popup">
             <div class="w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl shadow-inner bg-rose-500/10 text-rose-500">
@@ -109,7 +104,7 @@
         </div>
     </div>
 
-    <!-- ৩. নোটিফিকেশন সেন্টার পপআপ মডাল (Swipe Delete সহ) -->
+    <!-- নোটিফিকেশন সেন্টার মডাল -->
     <div id="admin-notification-modal" class="hidden fixed inset-0 z-50 flex justify-center items-center p-4 bg-black/70 backdrop-blur-sm">
         <div class="bg-slate-900 border border-slate-800 w-full max-w-md p-5 rounded-3xl space-y-3.5 text-xs shadow-2xl max-h-[85vh] flex flex-col">
             <div class="flex justify-between items-center border-b border-slate-800 pb-2.5">
@@ -120,20 +115,17 @@
                     <span id="notif-modal-count" class="bg-red-500/20 text-red-400 text-[10px] px-2 py-0.5 rounded-full font-bold border border-red-500/30">0 নতুন</span>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <button onclick="markAllAdminNotificationsRead()" class="text-[10px] text-slate-400 hover:text-emerald-400 transition" title="সব সিন করুন">সব সিন</button>
+                    <button onclick="markAllAdminNotificationsRead()" class="text-[10px] text-slate-400 hover:text-emerald-400 transition">সব সিন</button>
                     <button onclick="closeAdminNotificationModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-sm"></i></button>
                 </div>
             </div>
-
-            <p class="text-[10px] text-slate-500 font-light">নোটিফিকেশনে ক্লিক করলে সিন হবে এবং ডিলিট বাটনে ট্যাপ করলে স্থায়ীভাবে মুছে যাবে।</p>
-
             <div id="admin-notification-list" class="flex-1 overflow-y-auto space-y-2.5 pr-1">
                 <p class="text-center text-slate-500 py-6">কোনো নতুন নোটিফিকেশন নেই।</p>
             </div>
         </div>
     </div>
 
-    <!-- ৪. হাসপাতাল এডিট করার পপ-আপ মডাল -->
+    <!-- হাসপাতাল এডিট মডাল -->
     <div id="edit-hospital-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center p-4 z-50">
         <div id="modal-content" class="bg-slate-900 border border-slate-800 w-full max-w-md p-5 rounded-3xl space-y-3.5 text-xs shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-800 pb-2.5">
@@ -161,11 +153,11 @@
         </div>
     </div>
 
-    <!-- Firebase Admin Scripts -->
+    <!-- Firebase Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, getDocs, deleteDoc, doc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getDatabase, ref, get, set, push, remove, update, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
@@ -189,8 +181,8 @@
         let currentTheme = localStorage.getItem('admin_theme') || 'dark';
         let currentActiveTab = 'donors';
         let adminNotifications = [];
+        let allUsersDataList = []; // সার্চিং এর জন্য ইউজার ক্যাশ
 
-        // ইন-অ্যাপ কাস্টম ALERT
         window.alert = function(message) {
             const modal = document.getElementById('admin-custom-alert-modal');
             const msgEl = document.getElementById('admin-alert-message');
@@ -456,51 +448,84 @@
             }, 200);
         };
 
+        // 🌟 আধুনিক ও প্রিমিয়াম লগইন/রেজিস্ট্রেশন স্ক্রিন
         window.renderAdminAuthScreen = function() {
             const screen = document.getElementById('admin-screen');
             const isLight = currentTheme === 'light';
 
             screen.innerHTML = `
-                <div class="max-w-md mx-auto my-auto ${isLight ? 'bg-slate-50 border-slate-200' : 'bg-slate-950 border-slate-800'} p-6 rounded-3xl border shadow-xl space-y-4">
-                    <div class="flex ${isLight ? 'bg-slate-200' : 'bg-slate-900'} p-1 rounded-2xl text-xs font-bold">
-                        <button onclick="setAdminAuthMode('login')" class="flex-1 py-2 rounded-xl transition ${adminAuthMode === 'login' ? 'bg-red-600 text-white shadow' : 'text-slate-400'}">লগইন</button>
-                        <button onclick="setAdminAuthMode('signup')" class="flex-1 py-2 rounded-xl transition ${adminAuthMode === 'signup' ? 'bg-red-600 text-white shadow' : 'text-slate-400'}">নতুন অ্যাডমিন</button>
-                    </div>
-
-                    <div class="text-center pt-1">
-                        <h3 class="font-bold text-base ${isLight ? 'text-slate-800' : 'text-white'}">${adminAuthMode === 'login' ? 'অ্যাডমিন প্যানেলে প্রবেশ করুন' : 'নতুন অ্যাডমিন অ্যাকাউন্ট তৈরি'}</h3>
-                        <p class="text-[11px] text-slate-400 mt-0.5">নিরাপদ ক্রেডেনশিয়াল ব্যবহার করে সাইন-ইন করুন</p>
-                    </div>
-
-                    <div class="space-y-3 text-xs">
-                        <div>
-                            <label class="block font-semibold ${isLight ? 'text-slate-700' : 'text-slate-300'} mb-1">ইমেইল এড্রেস</label>
-                            <input type="email" id="admin-email" placeholder="admin@raktodan.com" class="w-full p-3 ${isLight ? 'bg-white border-slate-300 text-slate-800' : 'bg-slate-900 border-slate-800 text-white'} border rounded-xl focus:outline-none focus:border-red-500">
+                <div class="max-w-md mx-auto my-auto ${isLight ? 'bg-white/90 border-slate-200' : 'bg-slate-900/90 border-slate-800'} backdrop-blur-xl p-6 sm:p-8 rounded-[2rem] border shadow-2xl space-y-5 transition">
+                    
+                    <div class="text-center space-y-1.5">
+                        <div class="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-red-600 to-rose-500 text-white flex items-center justify-center text-2xl shadow-lg shadow-red-600/30">
+                            <i class="fa-solid fa-shield-halved"></i>
                         </div>
+                        <h3 class="font-extrabold text-lg sm:text-xl ${isLight ? 'text-slate-800' : 'text-white'}">
+                            ${adminAuthMode === 'login' ? 'অ্যাডমিন ড্যাশবোর্ড' : 'নতুন অ্যাডমিন তৈরি'}
+                        </h3>
+                        <p class="text-[11px] text-slate-400">নিরাপদ ক্রেডেনশিয়াল ব্যবহার করে প্যানেলে প্রবেশ করুন</p>
+                    </div>
+
+                    <div class="flex ${isLight ? 'bg-slate-100' : 'bg-slate-950'} p-1.5 rounded-2xl text-xs font-bold border ${isLight ? 'border-slate-200' : 'border-slate-800/80'}">
+                        <button onclick="setAdminAuthMode('login')" class="flex-1 py-2 rounded-xl transition ${adminAuthMode === 'login' ? 'bg-red-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}">লগইন</button>
+                        <button onclick="setAdminAuthMode('signup')" class="flex-1 py-2 rounded-xl transition ${adminAuthMode === 'signup' ? 'bg-red-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}">রেজিস্ট্রেশন</button>
+                    </div>
+
+                    <div class="space-y-3.5 text-xs">
                         <div>
-                            <label class="block font-semibold ${isLight ? 'text-slate-700' : 'text-slate-300'} mb-1">পাসওয়ার্ড</label>
-                            <input type="password" id="admin-pass" placeholder="••••••••" class="w-full p-3 ${isLight ? 'bg-white border-slate-300 text-slate-800' : 'bg-slate-900 border-slate-800 text-white'} border rounded-xl focus:outline-none focus:border-red-500">
+                            <label class="block font-semibold ${isLight ? 'text-slate-700' : 'text-slate-300'} mb-1.5">ইমেইল এড্রেস</label>
+                            <div class="relative flex items-center">
+                                <i class="fa-solid fa-envelope absolute left-3.5 text-slate-400 text-xs"></i>
+                                <input type="email" id="admin-email" placeholder="admin@raktodan.com" class="w-full pl-9 pr-3 py-3 ${isLight ? 'bg-slate-50 border-slate-300 text-slate-800' : 'bg-slate-950 border-slate-800 text-white'} border rounded-xl focus:outline-none focus:border-red-500 transition">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block font-semibold ${isLight ? 'text-slate-700' : 'text-slate-300'} mb-1.5">পাসওয়ার্ড</label>
+                            <div class="relative flex items-center">
+                                <i class="fa-solid fa-lock absolute left-3.5 text-slate-400 text-xs"></i>
+                                <input type="password" id="admin-pass" placeholder="••••••••" class="w-full pl-9 pr-10 py-3 ${isLight ? 'bg-slate-50 border-slate-300 text-slate-800' : 'bg-slate-950 border-slate-800 text-white'} border rounded-xl focus:outline-none focus:border-red-500 transition">
+                                <button type="button" onclick="toggleAdminPassVisibility('admin-pass', this)" class="absolute right-3.5 text-slate-400 hover:text-slate-200">
+                                    <i class="fa-solid fa-eye text-xs"></i>
+                                </button>
+                            </div>
                         </div>
 
                         ${adminAuthMode === 'login' ? `
                             <div class="text-right">
                                 <button onclick="handleAdminResetPassword()" class="text-[11px] font-semibold text-red-500 hover:underline">পাসওয়ার্ড ভুলে গেছেন?</button>
                             </div>
-                            <button onclick="handleAdminLogin()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 rounded-xl shadow-lg transition">
-                                অ্যাডমিন লগইন
+                            <button onclick="handleAdminLogin()" class="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-red-600/30 transition flex items-center justify-center space-x-2">
+                                <span>অ্যাডমিন প্যানেলে প্রবেশ করুন</span>
+                                <i class="fa-solid fa-arrow-right text-xs"></i>
                             </button>
                         ` : `
                             <div>
-                                <label class="block font-semibold ${isLight ? 'text-slate-700' : 'text-slate-300'} mb-1">সিক্রেট অ্যাডমিন পিন (ডিফল্ট: 1234)</label>
-                                <input type="password" id="admin-secret-pin" placeholder="Master PIN" class="w-full p-3 ${isLight ? 'bg-white border-slate-300 text-slate-800' : 'bg-slate-900 border-slate-800 text-white'} border rounded-xl focus:outline-none focus:border-red-500">
+                                <label class="block font-semibold ${isLight ? 'text-slate-700' : 'text-slate-300'} mb-1.5">মাস্টার অ্যাডমিন পিন (ডিফল্ট: 1234)</label>
+                                <div class="relative flex items-center">
+                                    <i class="fa-solid fa-key absolute left-3.5 text-slate-400 text-xs"></i>
+                                    <input type="password" id="admin-secret-pin" placeholder="Master PIN (1234)" class="w-full pl-9 pr-3 py-3 ${isLight ? 'bg-slate-50 border-slate-300 text-slate-800' : 'bg-slate-950 border-slate-800 text-white'} border rounded-xl focus:outline-none focus:border-red-500 transition">
+                                </div>
                             </div>
-                            <button onclick="handleAdminSignup()" class="w-full bg-slate-800 hover:bg-black text-white font-bold py-3.5 rounded-xl shadow-lg transition">
-                                অ্যাকাউন্ট তৈরি করুন
+                            <button onclick="handleAdminSignup()" class="w-full bg-gradient-to-r from-slate-800 to-slate-950 hover:bg-black text-white font-bold py-3.5 rounded-xl shadow-lg transition flex items-center justify-center space-x-2">
+                                <span>নতুন অ্যাডমিন তৈরি করুন</span>
+                                <i class="fa-solid fa-user-plus text-xs"></i>
                             </button>
                         `}
                     </div>
                 </div>
             `;
+        };
+
+        window.toggleAdminPassVisibility = function(inputId, btn) {
+            const input = document.getElementById(inputId);
+            if (input.type === "password") {
+                input.type = "text";
+                btn.innerHTML = '<i class="fa-solid fa-eye-slash text-xs"></i>';
+            } else {
+                input.type = "password";
+                btn.innerHTML = '<i class="fa-solid fa-eye text-xs"></i>';
+            }
         };
 
         window.setAdminAuthMode = function(mode) {
@@ -542,14 +567,17 @@
         };
 
         window.handleAdminResetPassword = async function() {
-            const email = prompt('আপনার অ্যাডমিন রেজিস্টার্ড ইমেইল দিন:');
-            if(email) {
-                try {
-                    await sendPasswordResetEmail(auth, email);
-                    alert('পাসওয়ার্ড রিসেট লিংক আপনার ইমেইলে পাঠানো হয়েছে!');
-                } catch(e) {
-                    alert('ত্রুটি: ' + e.message);
-                }
+            const emailInput = document.getElementById('admin-email');
+            const email = emailInput ? emailInput.value.trim() : '';
+            if(!email) {
+                alert('দয়া করে ইমেইল বক্সে আপনার রেজিস্টার্ড অ্যাডমিন ইমেইলটি লিখুন!');
+                return;
+            }
+            try {
+                await sendPasswordResetEmail(auth, email);
+                alert('পাসওয়ার্ড রিসেট লিংক আপনার ইমেইলে পাঠানো হয়েছে!');
+            } catch(e) {
+                alert('ত্রুটি: ' + e.message);
             }
         };
 
@@ -578,7 +606,7 @@
                     </div>
                 </div>
 
-                <!-- Tabs Navigation Bar (৬টি ট্যাব) -->
+                <!-- Tabs Navigation Bar -->
                 <div class="flex space-x-2 border-b ${isLight ? 'border-slate-200' : 'border-slate-800'} pb-3 overflow-x-auto no-scrollbar">
                     <button onclick="switchAdminTab('donors')" id="tab-btn-donors" class="admin-tab-btn bg-red-600 text-white px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition shadow">🩸 রক্তদাতা অনুমোদন</button>
                     <button onclick="switchAdminTab('requests')" id="tab-btn-requests" class="admin-tab-btn ${isLight ? 'bg-slate-100 text-slate-600' : 'bg-slate-950 text-slate-400'} px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition">⚠️ লাইভ অনুরোধ নিয়ন্ত্রণ</button>
@@ -606,12 +634,19 @@
                     <div id="admin-requests-list" class="space-y-3"></div>
                 </div>
 
-                <!-- Tab 3: Users -->
+                <!-- Tab 3: Users (সার্চ অপশন ও পারফেক্ট ডিলিট সহ) -->
                 <div id="admin-tab-users" class="admin-tab-content space-y-3 hidden">
-                    <div class="flex justify-between items-center">
-                        <h3 class="font-bold text-xs sm:text-sm ${isLight ? 'text-slate-800' : 'text-slate-300'}">ব্যবহারকারী নিয়ন্ত্রণ ও ব্লক প্যানেল:</h3>
-                        <button onclick="loadAdminUsers()" class="text-[11px] ${isLight ? 'bg-slate-200 text-slate-700' : 'bg-slate-800 text-slate-300'} px-2.5 py-1 rounded-lg transition"><i class="fa-solid fa-rotate-right"></i> রিফ্রেশ</button>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <h3 class="font-bold text-xs sm:text-sm ${isLight ? 'text-slate-800' : 'text-slate-300'}">নিবন্ধিত ব্যবহারকারী নিয়ন্ত্রণ:</h3>
+                        <button onclick="loadAdminUsers()" class="text-[11px] ${isLight ? 'bg-slate-200 text-slate-700' : 'bg-slate-800 text-slate-300'} px-2.5 py-1 rounded-lg transition self-end sm:self-auto"><i class="fa-solid fa-rotate-right"></i> রিফ্রেশ</button>
                     </div>
+
+                    <!-- 🔍 ইউজার ইনস্ট্যান্ট সার্চ বার -->
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
+                        <input type="text" id="user-search-input" onkeyup="filterAdminUsersList(this.value)" placeholder="ইউজারের নাম বা মোবাইল নম্বর দিয়ে সার্চ করুন..." class="w-full pl-9 pr-3 py-2.5 ${isLight ? 'bg-white border-slate-200 text-slate-800' : 'bg-slate-950 border-slate-800 text-white'} border rounded-xl text-xs focus:outline-none focus:border-red-500 shadow-sm">
+                    </div>
+
                     <div id="admin-users-list" class="space-y-3"></div>
                 </div>
 
@@ -631,14 +666,14 @@
                     <div id="admin-hospitals-list" class="space-y-3"></div>
                 </div>
 
-                <!-- Tab 5: Developer Info Management -->
+                <!-- Tab 5: Developer Control -->
                 <div id="admin-tab-developer" class="admin-tab-content space-y-4 hidden pb-6">
                     <div class="${isLight ? 'bg-white border-slate-200' : 'bg-slate-950 border-slate-800'} p-5 rounded-2xl border space-y-3 shadow-sm text-xs">
                         <div class="border-b ${isLight ? 'border-slate-200' : 'border-slate-800'} pb-2">
                             <h3 class="font-bold text-sm text-red-500 flex items-center gap-1.5">
                                 <i class="fa-solid fa-laptop-code"></i> ইউজার অ্যাপ ডেভেলপার তথ্য নিয়ন্ত্রণ
                             </h3>
-                            <p class="text-[11px] text-slate-400 mt-0.5">এখানে তথ্য আপডেট করলে সরাসরি ইউজার অ্যাপের সেটিংসের Developer Info সেকশনে পরিবর্তন হবে।</p>
+                            <p class="text-[11px] text-slate-400 mt-0.5">এখানে তথ্য আপডেট করলে সরাসরি ইউজার অ্যাপের Developer Info সেকশনে পরিবর্তন হবে।</p>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -647,14 +682,14 @@
                                 <input type="text" id="dev-name" class="w-full p-2.5 ${isLight ? 'bg-slate-50 border-slate-300 text-slate-800' : 'bg-slate-900 border-slate-800 text-white'} border rounded-xl focus:outline-none focus:border-red-500">
                             </div>
                             <div>
-                                <label class="block font-semibold mb-1 text-slate-400">পদবী / রোল (যেমন: ফুল স্ট্যাক ডেভেলপার)</label>
+                                <label class="block font-semibold mb-1 text-slate-400">পদবী / রোল</label>
                                 <input type="text" id="dev-role" class="w-full p-2.5 ${isLight ? 'bg-slate-50 border-slate-300 text-slate-800' : 'bg-slate-900 border-slate-800 text-white'} border rounded-xl focus:outline-none focus:border-red-500">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label class="block font-semibold mb-1 text-slate-400">প্রতিষ্ঠানের নাম (Organization)</label>
+                                <label class="block font-semibold mb-1 text-slate-400">প্রতিষ্ঠানের নাম</label>
                                 <input type="text" id="dev-org" class="w-full p-2.5 ${isLight ? 'bg-slate-50 border-slate-300 text-slate-800' : 'bg-slate-900 border-slate-800 text-white'} border rounded-xl focus:outline-none focus:border-red-500">
                             </div>
                             <div>
@@ -665,7 +700,7 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label class="block font-semibold mb-1 text-slate-400">মোবাইল নম্বর (সরাসরি কল)</label>
+                                <label class="block font-semibold mb-1 text-slate-400">মোবাইল নম্বর</label>
                                 <input type="text" id="dev-phone" class="w-full p-2.5 ${isLight ? 'bg-slate-50 border-slate-300 text-slate-800' : 'bg-slate-900 border-slate-800 text-white'} border rounded-xl focus:outline-none focus:border-red-500">
                             </div>
                             <div>
@@ -680,7 +715,7 @@
                                 <input type="email" id="dev-email" class="w-full p-2.5 ${isLight ? 'bg-slate-50 border-slate-300 text-slate-800' : 'bg-slate-900 border-slate-800 text-white'} border rounded-xl focus:outline-none focus:border-red-500">
                             </div>
                             <div>
-                                <label class="block font-semibold mb-1 text-slate-400">অফিস / স্টুডিওর ঠিকানা</label>
+                                <label class="block font-semibold mb-1 text-slate-400">অফিস / ঠিকানা</label>
                                 <input type="text" id="dev-address" class="w-full p-2.5 ${isLight ? 'bg-slate-50 border-slate-300 text-slate-800' : 'bg-slate-900 border-slate-800 text-white'} border rounded-xl focus:outline-none focus:border-red-500">
                             </div>
                         </div>
@@ -694,21 +729,21 @@
                             </div>
                         </div>
 
-                        <button onclick="saveDeveloperInfoSettings()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-red-600/25 transition mt-2">
+                        <button onclick="saveDeveloperInfoSettings()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 rounded-xl shadow-lg transition mt-2">
                             ডেভেলপার তথ্য সংরক্ষণ করুন (Update Developer Info)
                         </button>
                     </div>
                 </div>
 
-                <!-- Tab 6: Ad Control (Adsterra & Start.io Management) -->
+                <!-- Tab 6: Ads Control -->
                 <div id="admin-tab-ads" class="admin-tab-content space-y-4 hidden pb-6">
                     <div class="${isLight ? 'bg-white border-slate-200' : 'bg-slate-950 border-slate-800'} p-5 rounded-2xl border space-y-4 shadow-sm text-xs">
                         <div class="flex justify-between items-center border-b ${isLight ? 'border-slate-200' : 'border-slate-800'} pb-3">
                             <div>
                                 <h3 class="font-bold text-sm text-red-500 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-rectangle-ad"></i> বিজ্ঞাপন নেটওয়ার্ক নিয়ন্ত্রণ (Adsterra & Start.io)
+                                    <i class="fa-solid fa-rectangle-ad"></i> বিজ্ঞাপন নিয়ন্ত্রণ (Adsterra & Start.io)
                                 </h3>
-                                <p class="text-[11px] text-slate-400 mt-0.5">এখান থেকে ইউজার অ্যাপের সকল বিজ্ঞাপন নিয়ন্ত্রণ করুন।</p>
+                                <p class="text-[11px] text-slate-400 mt-0.5">এখান থেকে ইউজার অ্যাপের বিজ্ঞাপন চালু বা বন্ধ রাখুন।</p>
                             </div>
                             <div class="flex items-center space-x-2">
                                 <span class="font-bold text-slate-300 text-[11px]">সকল অ্যাড সক্রিয়:</span>
@@ -727,7 +762,7 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block font-semibold mb-1 text-slate-400">অ্যাড প্রদর্শনের ধরন (Placement)</label>
+                                <label class="block font-semibold mb-1 text-slate-400">অ্যাড প্রদর্শনের ধরন</label>
                                 <select id="ad-placement-type" class="w-full p-2.5 ${isLight ? 'bg-slate-50 border-slate-300 text-slate-800' : 'bg-slate-900 border-slate-800 text-white'} border rounded-xl focus:outline-none focus:border-red-500">
                                     <option value="banner">ব্যানার বিজ্ঞাপন (Bottom Banner)</option>
                                     <option value="interstitial">ফুলস্ক্রিন / ইন্টারস্টিশিয়াল অ্যাড</option>
@@ -737,30 +772,26 @@
                             </div>
                         </div>
 
-                        <!-- Adsterra Section -->
+                        <!-- Adsterra -->
                         <div class="p-3.5 bg-slate-900/50 border border-slate-800/80 rounded-2xl space-y-2.5">
-                            <h4 class="font-bold text-xs text-amber-400 flex items-center gap-1.5">
-                                <i class="fa-solid fa-bullhorn"></i> Adsterra কনফিগারেশন
-                            </h4>
+                            <h4 class="font-bold text-xs text-amber-400 flex items-center gap-1.5"><i class="fa-solid fa-bullhorn"></i> Adsterra কনফিগারেশন</h4>
                             <div>
-                                <label class="block text-[11px] text-slate-400 mb-1">Adsterra ব্যানার কোড / স্ক্রিপ্ট (Ad Key or Code)</label>
-                                <textarea id="ad-adsterra-banner" placeholder="Adsterra ব্যানার কোড বা Ad Key এখানে পেস্ট করুন" class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white h-16 focus:outline-none focus:border-red-500 font-mono text-[11px]"></textarea>
+                                <label class="block text-[11px] text-slate-400 mb-1">Adsterra ব্যানার কোড / স্ক্রিপ্ট</label>
+                                <textarea id="ad-adsterra-banner" class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white h-16 focus:outline-none focus:border-red-500 font-mono text-[11px]"></textarea>
                             </div>
                             <div>
-                                <label class="block text-[11px] text-slate-400 mb-1">Adsterra ডিরেক্ট লিঙ্ক / স্মার্ট লিংক (Direct Smartlink URL)</label>
-                                <input type="text" id="ad-adsterra-smartlink" placeholder="https://www.profitablecpmrate.com/..." class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-red-500">
+                                <label class="block text-[11px] text-slate-400 mb-1">Adsterra ডিরেক্ট লিঙ্ক / স্মার্ট লিংক</label>
+                                <input type="text" id="ad-adsterra-smartlink" class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-red-500">
                             </div>
                         </div>
 
-                        <!-- Start.io Section -->
+                        <!-- Start.io -->
                         <div class="p-3.5 bg-slate-900/50 border border-slate-800/80 rounded-2xl space-y-2.5">
-                            <h4 class="font-bold text-xs text-sky-400 flex items-center gap-1.5">
-                                <i class="fa-solid fa-mobile-screen"></i> Start.io কনফিগারেশন
-                            </h4>
+                            <h4 class="font-bold text-xs text-sky-400 flex items-center gap-1.5"><i class="fa-solid fa-mobile-screen"></i> Start.io কনফিগারেশন</h4>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                                 <div>
                                     <label class="block text-[11px] text-slate-400 mb-1">Start.io App ID *</label>
-                                    <input type="text" id="ad-startio-appid" placeholder="যেমন: 205849302" class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-red-500">
+                                    <input type="text" id="ad-startio-appid" class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-red-500">
                                 </div>
                                 <div>
                                     <label class="block text-[11px] text-slate-400 mb-1">Start.io বিজ্ঞাপন ফরম্যাট</label>
@@ -773,7 +804,7 @@
                             </div>
                         </div>
 
-                        <button onclick="saveAdNetworkSettings()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-red-600/25 transition mt-2">
+                        <button onclick="saveAdNetworkSettings()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 rounded-xl shadow-lg transition mt-2">
                             বিজ্ঞাপন সেটিংস সংরক্ষণ করুন (Save Ad Settings)
                         </button>
                     </div>
@@ -794,7 +825,6 @@
             const isLight = currentTheme === 'light';
             document.querySelectorAll('.admin-tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.admin-tab-btn').forEach(btn => {
-                btn.classList.remove('bg-red-600', 'text-white', 'shadow');
                 btn.className = `admin-tab-btn ${isLight ? 'bg-slate-100 text-slate-600' : 'bg-slate-950 text-slate-400'} px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition`;
             });
             document.getElementById(`admin-tab-${tabName}`).classList.remove('hidden');
@@ -804,22 +834,28 @@
 
         window.loadAdminStats = async function() {
             try {
-                const userSnap = await getDocs(collection(db, "users"));
-                document.getElementById('stat-users').innerText = userSnap.size;
+                const userSnap = await get(ref(rtdb, 'users'));
+                let userCount = userSnap.exists() ? Object.keys(userSnap.val()).length : 0;
+                const statUsers = document.getElementById('stat-users');
+                if (statUsers) statUsers.innerText = userCount;
 
                 const reqSnap = await getDocs(collection(db, "bloodRequests"));
-                document.getElementById('stat-requests').innerText = reqSnap.size;
+                const statReqs = document.getElementById('stat-requests');
+                if (statReqs) statReqs.innerText = reqSnap.size;
 
                 const donorSnap = await get(ref(rtdb, 'donors'));
+                const statDonors = document.getElementById('stat-donors');
+                const statPending = document.getElementById('stat-pending');
+
                 if(donorSnap.exists()) {
                     let donors = Object.values(donorSnap.val());
                     let approvedCount = donors.filter(d => d.status === 'Approved').length;
                     let pendingCount = donors.filter(d => d.status === 'Pending').length;
-                    document.getElementById('stat-donors').innerText = approvedCount;
-                    document.getElementById('stat-pending').innerText = pendingCount;
+                    if (statDonors) statDonors.innerText = approvedCount;
+                    if (statPending) statPending.innerText = pendingCount;
                 } else {
-                    document.getElementById('stat-donors').innerText = 0;
-                    document.getElementById('stat-pending').innerText = 0;
+                    if (statDonors) statDonors.innerText = 0;
+                    if (statPending) statPending.innerText = 0;
                 }
             } catch(e) {
                 console.error("Stats Error:", e);
@@ -838,7 +874,15 @@
                     return;
                 }
                 const data = snapshot.val();
-                Object.entries(data).forEach(([key, d]) => {
+                let donorEntries = Object.entries(data);
+
+                donorEntries.sort((a, b) => {
+                    if (a[1].status === 'Pending' && b[1].status !== 'Pending') return -1;
+                    if (a[1].status !== 'Pending' && b[1].status === 'Pending') return 1;
+                    return (b[1].timestamp || 0) - (a[1].timestamp || 0);
+                });
+
+                donorEntries.forEach(([key, d]) => {
                     let isApproved = d.status === 'Approved';
                     let displayLoc = `${d.upazila ? d.upazila + ', ' : ''}${d.district || ''}`;
                     let btnApprove = !isApproved ? `<button onclick="approveDonor('${key}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1 shadow"><i class="fa-solid fa-check"></i> অনুমোদন</button>` : '';
@@ -950,45 +994,123 @@
             });
         };
 
+        // 🌟 ইউজার ডেটা লোড ও সার্চ ক্যাশিং
         window.loadAdminUsers = async function() {
             let container = document.getElementById('admin-users-list');
             const isLight = currentTheme === 'light';
             try {
-                const querySnapshot = await getDocs(collection(db, "users"));
-                container.innerHTML = "";
-                if(querySnapshot.empty) {
+                const snap = await get(ref(rtdb, 'users'));
+                allUsersDataList = [];
+                if(!snap.exists()) {
                     container.innerHTML = `<div class="${isLight ? 'bg-white border-slate-200 text-slate-500' : 'bg-slate-950 border-slate-800 text-slate-500'} p-6 rounded-2xl text-center text-xs border">কোনো ইউজার তালিকাভুক্ত নেই।</div>`;
                     return;
                 }
-                querySnapshot.forEach((docSnap) => {
-                    let u = docSnap.data();
-                    let uid = docSnap.id;
-                    let isBlocked = u.isBlocked;
-                    container.innerHTML += `
-                        <div class="p-3 ${isLight ? 'bg-white border-slate-200' : 'bg-slate-950 border-slate-800'} border rounded-2xl flex justify-between items-center text-xs shadow-sm">
-                            <div>
-                                <b class="${isLight ? 'text-slate-800' : 'text-white'} text-sm">${u.email}</b>
-                                <p class="text-slate-500 text-[10px] mt-0.5">মোবাইল: ${u.phone || 'N/A'}</p>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <span class="text-[10px] ${isBlocked ? 'text-rose-500 bg-rose-500/10 border-rose-500/20' : 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20'} px-2 py-0.5 rounded font-semibold border">
-                                    ${isBlocked ? 'ব্লকড' : 'সক্রিয়'}
-                                </span>
-                                <button onclick="toggleBlockUser('${uid}', ${isBlocked})" class="${isBlocked ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-amber-600 hover:bg-amber-700'} text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition shadow">
-                                    ${isBlocked ? 'আনব্লক' : 'ব্লক করুন'}
-                                </button>
-                            </div>
-                        </div>
-                    `;
+                const users = snap.val();
+                Object.entries(users).forEach(([phoneKey, u]) => {
+                    allUsersDataList.push({ phoneKey, ...u });
                 });
+                renderAdminUsersList(allUsersDataList);
             } catch(e) {
                 container.innerHTML = '<p class="text-red-500 text-xs text-center py-4">ইউজার লোড সমস্যা।</p>';
             }
         };
 
-        window.toggleBlockUser = async function(uid, currentStatus) {
+        // ইউজার তালিকা রেন্ডার ফাংশন (ব্লক এবং ১০০% পারফেক্ট ডিলিট সহ)
+        function renderAdminUsersList(users) {
+            let container = document.getElementById('admin-users-list');
+            const isLight = currentTheme === 'light';
+            container.innerHTML = "";
+
+            if (users.length === 0) {
+                container.innerHTML = `<div class="${isLight ? 'bg-white border-slate-200 text-slate-500' : 'bg-slate-950 border-slate-800 text-slate-500'} p-6 rounded-2xl text-center text-xs border">কোনো ব্যবহারকারী পাওয়া যায়নি।</div>`;
+                return;
+            }
+
+            users.forEach(u => {
+                let isBlocked = u.isBlocked === true;
+                container.innerHTML += `
+                    <div class="p-3.5 ${isLight ? 'bg-white border-slate-200' : 'bg-slate-950 border-slate-800'} border rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5 text-xs shadow-sm">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <b class="${isLight ? 'text-slate-800' : 'text-white'} text-sm">${u.name || 'বেনামী ব্যবহারকারী'}</b>
+                                <span class="text-[10px] ${isBlocked ? 'text-rose-500 bg-rose-500/10 border-rose-500/20' : 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20'} px-2 py-0.5 rounded-md font-semibold border">
+                                    ${isBlocked ? 'ব্লকড' : 'সক্রিয়'}
+                                </span>
+                            </div>
+                            <p class="text-slate-400 text-[11px] mt-1">
+                                <i class="fa-solid fa-phone text-slate-500 mr-1"></i><span class="font-mono">${u.phoneKey}</span>
+                                <span class="mx-1.5 text-slate-600">|</span> 
+                                রোল: <span class="capitalize">${u.role || 'donor'}</span>
+                            </p>
+                        </div>
+                        <div class="flex items-center space-x-2 self-end sm:self-auto">
+                            <button onclick="toggleBlockUser('${u.phoneKey}', ${isBlocked})" class="${isBlocked ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-amber-600 hover:bg-amber-700'} text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition shadow">
+                                ${isBlocked ? 'আনব্লক' : 'ব্লক করুন'}
+                            </button>
+                            <button onclick="deleteRegisteredUserPermanent('${u.phoneKey}')" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1 shadow" title="চিরতরে মুছে ফেলুন">
+                                <i class="fa-solid fa-trash-can"></i> ডিলিট
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // 🔍 লাইভ ইউজার সার্চ ফিল্টার
+        window.filterAdminUsersList = function(query) {
+            query = (query || '').toLowerCase().trim();
+            if(!query) {
+                renderAdminUsersList(allUsersDataList);
+            } else {
+                const filtered = allUsersDataList.filter(u => 
+                    (u.name || '').toLowerCase().includes(query) || 
+                    (u.phoneKey || '').includes(query) ||
+                    (u.phone || '').includes(query) ||
+                    (u.role || '').toLowerCase().includes(query)
+                );
+                renderAdminUsersList(filtered);
+            }
+        };
+
+        // 🗑️ ফায়ারবেস থেকে ১০০% স্থায়ীভাবে ইউজার মুছে ফেলা (Cascade Delete)
+        window.deleteRegisteredUserPermanent = function(phoneKey) {
+            showAdminConfirm(
+                'ইউজার চিরতরে ডিলিট!',
+                `আপনি কি নিশ্চিত যে (${phoneKey}) ব্যবহারকারীকে ডাটাবেজ থেকে সম্পূর্ণ মুছে ফেলতে চান?\nতার ডোনার প্রোফাইল ও যাবতীয় তথ্যও স্বয়ংক্রিয়ভাবে মুছে যাবে।`,
+                'হ্যাঁ, চিরতরে মুছুন',
+                async () => {
+                    try {
+                        // ১. ইউজার টেবিল থেকে ডিলিট
+                        await remove(ref(rtdb, `users/${phoneKey}`));
+
+                        // ২. ওটিপি টেবিল পরিষ্কার
+                        await remove(ref(rtdb, `sms_otps/${phoneKey}`));
+
+                        // ৩. ডোনার তালিকা থেকে ওই নম্বরের প্রোফাইল খুঁজে ডিলিট
+                        const donorSnap = await get(ref(rtdb, 'donors'));
+                        if (donorSnap.exists()) {
+                            donorSnap.forEach(child => {
+                                const val = child.val();
+                                if (val.uid === phoneKey || val.phone === phoneKey) {
+                                    remove(ref(rtdb, `donors/${child.key}`));
+                                }
+                            });
+                        }
+
+                        alert('ব্যবহারকারী ও তার সকল ডাটা সফলভাবে ফায়ারবেস থেকে চিরতরে মুছে ফেলা হয়েছে!');
+                        loadAdminUsers();
+                        loadAdminStats();
+                        loadAdminDonors();
+                    } catch(e) {
+                        alert('ডিলিট ব্যর্থ হয়েছে: ' + e.message);
+                    }
+                }
+            );
+        };
+
+        window.toggleBlockUser = async function(phoneKey, currentStatus) {
             try {
-                await updateDoc(doc(db, "users", uid), { isBlocked: !currentStatus });
+                await update(ref(rtdb, `users/${phoneKey}`), { isBlocked: !currentStatus });
                 alert('ইউজারের ব্লকিং স্ট্যাটাস সফলভাবে পরিবর্তন করা হয়েছে!');
                 loadAdminUsers();
             } catch(e) {
