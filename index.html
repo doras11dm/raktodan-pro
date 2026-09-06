@@ -24,6 +24,15 @@
         .animate-custom-popup {
             animation: popupAnim 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
+		
+		/* SOS স্লাইডারের স্ক্রোলবার লুকানো ও স্ন্যাপ ইফেক্ট */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.sos-slider { scroll-snap-type: x mandatory; }
+.sos-slide-item { scroll-snap-align: start; }
+		
+		
+		
     </style>
 </head>
 <body class="bg-slate-900 flex justify-center items-center h-screen overflow-hidden">
@@ -159,31 +168,32 @@
 
         const GLOBAL_APP_LOGO = "https://lh3.googleusercontent.com/d/1_cRfZ3IeCWXrd2j0AqbbSVXaEqsbCRtf";
 
-        window.alert = function(message) {
-            const modal = document.getElementById('inapp-custom-alert-modal');
-            const msgEl = document.getElementById('inapp-alert-message');
-            const titleEl = document.getElementById('inapp-alert-title');
-            const iconContainer = document.getElementById('inapp-alert-icon-container');
-            const icon = document.getElementById('inapp-alert-icon');
+       window.alert = function(message) {
+    const modal = document.getElementById('inapp-custom-alert-modal');
+    const msgEl = document.getElementById('inapp-alert-message');
+    const titleEl = document.getElementById('inapp-alert-title');
+    const iconContainer = document.getElementById('inapp-alert-icon-container');
+    const icon = document.getElementById('inapp-alert-icon');
 
-            if(!modal || !msgEl) return;
-            msgEl.innerText = message;
+    if(!modal || !msgEl) return;
+    msgEl.innerText = message;
 
-            if (message.includes('সফল') || message.includes('অভিনন্দন') || message.includes('Success')) {
-                titleEl.innerText = "সফল হয়েছে!";
-                iconContainer.className = "w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl shadow-inner bg-emerald-50 text-emerald-600";
-                icon.className = "fa-solid fa-circle-check";
-            } else if (message.includes('ভুল') || message.includes('ব্যর্থ') || message.includes('সমস্যা') || message.includes('ত্রুটি') || message.includes('সতর্কতা')) {
-                titleEl.innerText = "সতর্কবার্তা";
-                iconContainer.className = "w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl shadow-inner bg-rose-50 text-rose-600";
-                icon.className = "fa-solid fa-triangle-exclamation";
-            } else {
-                titleEl.innerText = "দুঃখিত";
-                iconContainer.className = "w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl shadow-inner bg-red-50 text-red-600";
-                icon.className = "fa-solid fa-bell";
-            }
-            modal.classList.remove('hidden');
-        };
+    // সফল, অভিনন্দন, Success বা শনাক্ত থাকলে গ্রিন সাকসেস বক্স দেখাবে
+    if (message.includes('সফল') || message.includes('অভিনন্দন') || message.includes('Success') || message.includes('শনাক্ত')) {
+        titleEl.innerText = "সফল হয়েছে!";
+        iconContainer.className = "w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl shadow-inner bg-emerald-50 text-emerald-600";
+        icon.className = "fa-solid fa-circle-check";
+    } else if (message.includes('ভুল') || message.includes('ব্যর্থ') || message.includes('সমস্যা') || message.includes('ত্রুটি') || message.includes('সতর্কতা')) {
+        titleEl.innerText = "সতর্কবার্তা";
+        iconContainer.className = "w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl shadow-inner bg-rose-50 text-rose-600";
+        icon.className = "fa-solid fa-triangle-exclamation";
+    } else {
+        titleEl.innerText = "বিজ্ঞপ্তি"; // ডিফল্ট "দুঃখিত" এর বদলে "বিজ্ঞপ্তি" থাকা বেশি উপযুক্ত
+        iconContainer.className = "w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl shadow-inner bg-red-50 text-red-600";
+        icon.className = "fa-solid fa-bell";
+    }
+    modal.classList.remove('hidden');
+};
 
         window.closeInAppAlert = function() {
             const modal = document.getElementById('inapp-custom-alert-modal');
@@ -431,6 +441,33 @@
                 }
             });
         }
+		
+	// ====================================================
+// 🚨 SOS অ্যালার্ট ২৪ ঘণ্টা পর স্বয়ংক্রিয়ভাবে মুছে ফেলা
+// ====================================================
+function autoCleanExpiredSOSAlerts() {
+    const sosRef = ref(rtdb, 'sosAlerts');
+    // ২৪ ঘণ্টা = ২৪ * ৬০ মিনিট * ৬০ সেকেন্ড * ১০০০ মিলিসেকেন্ড
+    const twentyFourHoursInMs = 24 * 60 * 60 * 1000; 
+    const now = Date.now();
+
+    onValue(sosRef, (snapshot) => {
+        if (!snapshot.exists()) return;
+        const data = snapshot.val();
+
+        Object.entries(data).forEach(([key, val]) => {
+            const alertTime = val.timestamp || val.time || 0;
+            // ২৪ ঘণ্টার বেশি পুরনো হলে ডাটাবেজ থেকে স্বয়ংক্রিয়ভাবে মুছে যাবে
+            if (now - alertTime > twentyFourHoursInMs) {
+                remove(ref(rtdb, `sosAlerts/${key}`))
+                    .then(() => console.log(`SOS Alert ${key} (24h expired) removed from database.`))
+                    .catch(err => console.error("SOS cleanup error:", err));
+            }
+        });
+    });
+}
+
+
 
         setTimeout(() => {
             const splash = document.getElementById('splash-screen');
@@ -459,7 +496,8 @@
 
             if (tabName === 'home') {
                 screen.innerHTML = `
-                    <div class="mb-4">
+                    <!-- SOS ব্রডকাস্ট বাটন -->
+                    <div class="mb-3">
                         <div onclick="switchTab('sos')" class="bg-gradient-to-r from-red-600 via-rose-600 to-red-700 text-white p-4 rounded-2xl shadow-xl shadow-red-500/20 flex items-center justify-between cursor-pointer transform hover:scale-[1.02] transition border border-red-500/30">
                             <div class="flex items-center space-x-3.5">
                                 <div class="bg-white/20 p-3 rounded-xl backdrop-blur-md animate-pulse">
@@ -476,6 +514,10 @@
                         </div>
                     </div>
 
+                    <!-- 🚨 লাইভ সক্রিয় SOS এলার্ট কার্ড সেকশন (কল বাটন সহ) -->
+                    <div id="live-sos-container" class="space-y-2.5 mb-4"></div>
+
+                    <!-- সাব ট্যাব (অনুরোধ ও ডোনার) -->
                     <div class="flex space-x-2 bg-slate-200/70 p-1 rounded-2xl mb-4">
                         <button onclick="switchHomeSubTab('requests')" id="sub-tab-req" class="flex-1 py-2 rounded-xl text-xs font-bold bg-white text-red-600 shadow-sm transition">${i18n[currentLang].liveReqTab}</button>
                         <button onclick="switchHomeSubTab('donors')" id="sub-tab-don" class="flex-1 py-2 rounded-xl text-xs font-semibold text-slate-600 transition">${i18n[currentLang].donorsTab}</button>
@@ -483,8 +525,9 @@
 
                     <div id="home-sub-content"></div>
                 `;
+                loadLiveSOSAlerts(); // SOS কার্ড লোড হবে
                 switchHomeSubTab('requests');
-            } 
+            }
             else if (tabName === 'search') {
                 screen.innerHTML = `
                     <h2 class="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
@@ -716,36 +759,129 @@
         };
 
         window.triggerSOS = async function() {
-            let patient = document.getElementById('sos-patient').value.trim();
-            let hosp = document.getElementById('sos-hosp').value.trim();
-            let phone = document.getElementById('sos-phone').value.trim();
+    let patient = document.getElementById('sos-patient').value.trim();
+    let hosp = document.getElementById('sos-hosp').value.trim();
+    let phone = document.getElementById('sos-phone').value.trim();
 
-            if(!hosp || !phone) {
-                alert('দয়া করে হাসপাতালের নাম ও মোবাইল নম্বর দিন!');
-                return;
+    if(!hosp || !phone) {
+        alert('দয়া করে হাসপাতালের নাম ও মোবাইল নম্বর দিন!');
+        return;
+    }
+
+    try {
+        const sosRef = push(ref(rtdb, 'sosAlerts'));
+        await set(sosRef, {
+            patient: patient || 'জরুরি রোগী',
+            hospital: hosp,
+            phone: phone,
+            time: Date.now(),
+            timestamp: Date.now(), // ৭ দিন ট্র্যাক করার জন্য টাইমস্ট্যাম্প
+            status: 'Active'
+        });
+
+        triggerDeviceNotification("🚨 জরুরি SOS রক্ত ওয়ান্টেড!", `হাসপাতাল: ${hosp}\nযোগাযোগ: ${phone}`);
+        pushInAppNotification("🚨 জরুরি SOS অ্যালার্ট!", `হাসপাতাল: ${hosp} তে রক্তের জরুরি প্রয়োজন। রোগী: ${patient || 'জরুরি'}, ফোন: ${phone}`);
+
+        alert('🚨 সফলভাবে SOS অ্যালার্ট ব্রডকাস্ট করা হয়েছে এবং সকল ডোনারের কাছে নোটিফিকেশন পাঠানো হয়েছে!');
+        switchTab('home', document.querySelector('.nav-btn'));
+    } catch(e) {
+        alert('SOS পাঠাতে সমস্যা হয়েছে: ' + e.message);
+    }
+};
+   
+
+// ====================================================
+// 🚨 লাইভ SOS স্মার্ট স্লাইডার (একের অধিক হলে পাশাপাশি সোয়াইপ)
+// ====================================================
+window.loadLiveSOSAlerts = function() {
+    const container = document.getElementById('live-sos-container');
+    if (!container) return;
+
+    const sosRef = ref(rtdb, 'sosAlerts');
+    onValue(sosRef, (snapshot) => {
+        if (!container) return;
+        container.innerHTML = "";
+        
+        if (!snapshot.exists()) return;
+
+        const data = snapshot.val();
+        let sosList = [];
+        const twentyFourHoursInMs = 24 * 60 * 60 * 1000; // ২৪ ঘণ্টা
+        const now = Date.now();
+
+        Object.entries(data).forEach(([key, item]) => {
+            const time = item.timestamp || item.time || 0;
+            // ২৪ ঘণ্টার মধ্যে থাকা সক্রিয় SOS ফিল্টার
+            if (now - time <= twentyFourHoursInMs && item.status !== 'Resolved') {
+                sosList.push({ id: key, ...item });
             }
+        });
 
-            try {
-                const sosRef = push(ref(rtdb, 'sosAlerts'));
-                await set(sosRef, {
-                    patient: patient || 'জরুরি রোগী',
-                    hospital: hosp,
-                    phone: phone,
-                    time: Date.now(),
-                    status: 'Active'
-                });
+        if (sosList.length === 0) return;
 
-                triggerDeviceNotification("🚨 জরুরি SOS রক্ত ওয়ান্টেড!", `হাসপাতাল: ${hosp}\nযোগাযোগ: ${phone}`);
-                pushInAppNotification("🚨 জরুরি SOS অ্যালার্ট!", `হাসপাতাল: ${hosp} তে রক্তের জরুরি প্রয়োজন। রোগী: ${patient || 'জরুরি'}, ফোন: ${phone}`);
+        // নতুন অ্যালার্ট আগে দেখাবে
+        sosList.sort((a, b) => (b.timestamp || b.time || 0) - (a.timestamp || a.time || 0));
 
-                alert('🚨 সফলভাবে SOS অ্যালার্ট ব্রডকাস্ট করা হয়েছে এবং সকল ডোনারের কাছে নোটিফিকেশন পাঠানো হয়েছে!');
-                switchTab('home', document.querySelector('.nav-btn'));
-            } catch(e) {
-                alert('SOS পাঠাতে সমস্যা হয়েছে: ' + e.message);
-            }
-        };
+        const isMultiple = sosList.length > 1;
 
-        function renderGuideSection() {
+        // হেডার ও স্লাইডার র‍্যাপার তৈরি
+        let htmlContent = `
+            <div class="flex justify-between items-center px-1 mb-1.5">
+                <span class="text-[11px] font-extrabold text-red-600 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-red-600 animate-ping inline-block"></span>
+                    জরুরি SOS অ্যালার্ট (${sosList.length}টি সক্রিয়)
+                </span>
+                ${isMultiple ? '<span class="text-[10px] text-slate-400 font-medium"><i class="fa-solid fa-arrows-left-right text-red-500 mr-1"></i>সোয়াইপ করুন</span>' : ''}
+            </div>
+
+            <!-- স্লাইডার কন্টেইনার (একের অধিক হলে পাশাপাশি স্ক্রোল হবে) -->
+            <div class="flex ${isMultiple ? 'overflow-x-auto sos-slider no-scrollbar space-x-3 pb-2' : ''}">
+        `;
+
+        sosList.forEach(sos => {
+            const waLink = getWhatsAppLink(sos.phone, sos.patient || 'জরুরি রোগী');
+            // ১টি হলে ফুল উইডথ (w-full), একের অধিক হলে ৮৮% উইডথ যাতে পরের কার্ডের একটু অংশ দেখা যায় (হিন্ট)
+            const itemWidthClass = isMultiple ? 'w-[88%] shrink-0 sos-slide-item' : 'w-full';
+
+            htmlContent += `
+                <div class="${itemWidthClass} bg-gradient-to-br from-rose-50 to-red-50 border-2 border-red-500/40 p-3.5 rounded-2xl shadow-md text-xs relative overflow-hidden flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="bg-red-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1">
+                                <i class="fa-solid fa-bell animate-bounce"></i> EMERGENCY
+                            </span>
+                            <span class="text-[10px] text-slate-400 font-medium">
+                                <i class="fa-solid fa-clock text-slate-400 mr-1"></i>২৪ ঘণ্টার জন্য লাইভ
+                            </span>
+                        </div>
+
+                        <div class="space-y-1 text-slate-700 font-medium pl-0.5 mb-3">
+                            <p class="truncate"><i class="fa-solid fa-hospital text-red-600 mr-1.5"></i><b>হাসপাতাল:</b> ${sos.hospital}</p>
+                            ${sos.patient ? `<p class="truncate"><i class="fa-solid fa-user-injured text-red-600 mr-1.5"></i><b>রোগী:</b> ${sos.patient}</p>` : ''}
+                            <p><i class="fa-solid fa-phone text-red-600 mr-1.5"></i><b>হটলাইন:</b> <span class="font-bold text-slate-900">${sos.phone}</span></p>
+                        </div>
+                    </div>
+
+                    <!-- সরাসরি কল ও হোয়াটসঅ্যাপ বাটন -->
+                    <div class="grid grid-cols-2 gap-2 pt-1.5 border-t border-red-200/60">
+                        <a href="${waLink}" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-xl text-center text-xs flex items-center justify-center gap-1.5 shadow transition">
+                            <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
+                        </a>
+                        <a href="tel:${sos.phone}" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-xl text-center text-xs flex items-center justify-center gap-1.5 shadow-md shadow-red-600/30 transition">
+                            <i class="fa-solid fa-phone text-xs"></i> কল করুন
+                        </a>
+                    </div>
+                </div>
+            `;
+        });
+
+        htmlContent += `</div>`;
+        container.innerHTML = htmlContent;
+    });
+};
+
+
+		function renderGuideSection() {
             const screen = document.getElementById('app-screen');
             screen.innerHTML = `
                 <h2 class="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
@@ -1304,10 +1440,11 @@
                         const detected = data.address.state_district || data.address.city || data.address.state || "বাংলাদেশ";
                         locDisplay.innerText = detected;
                         localStorage.setItem('detected_location', detected);
-                        alert(`আপনার বর্তমান লোকেশন শনাক্ত হয়েছে: ${detected}`);
+                         alert(`সফল হয়েছে! আপনার বর্তমান লোকেশন শনাক্ত হয়েছে: ${detected}`);
                     } catch(e) {
                         locDisplay.innerText = `ল্যাট: ${lat.toFixed(2)}, লং: ${lon.toFixed(2)}`;
                         localStorage.setItem('detected_location', `${lat.toFixed(2)}, ${lon.toFixed(2)}`);
+						 alert(`সফল হয়েছে! জিপিএস কোঅর্ডিনেট শনাক্ত হয়েছে: ${lat.toFixed(2)}, ${lon.toFixed(2)}`);
                     }
                 }, (error) => {
                     alert('লোকেশন পারমিশন পাওয়া যায়নি: ' + error.message);
@@ -1322,7 +1459,7 @@
             currentLang = langCode;
             localStorage.setItem('app_language', langCode);
             applyLanguageSettings();
-            alert(langCode === 'en' ? 'Language switched to English!' : 'ভাষা বাংলায় সফলভাবে পরিবর্তিত হয়েছে!');
+            alert(langCode === 'en' ? 'Success! Language switched to English.' : 'সফল হয়েছে! ভাষা বাংলায় পরিবর্তিত হয়েছে।');
             renderSettingsSection();
         };
 
@@ -2402,6 +2539,7 @@
         initAppUserSession();
         applyLanguageSettings();
         switchTab('home', document.querySelector('.nav-btn'));
+		autoCleanExpiredSOSAlerts();
 		
         // ==========================================
         // 📢 ১০০% কার্যকর অ্যাড লিসেনার (Adsterra & Start.io)
