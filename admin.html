@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>অ্যাডমিন অ্যাপ - রক্তদান প্রো</title>
-
+    <!-- PWA Isolation for Admin App -->
     <link rel="manifest" href="./manifest-admin.json">
-
-        <!-- Tailwind CSS -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -184,7 +183,12 @@
         let currentTheme = localStorage.getItem('admin_theme') || 'dark';
         let currentActiveTab = 'donors';
         let adminNotifications = [];
-        let allUsersDataList = []; // সার্চিং এর জন্য ইউজার ক্যাশ
+
+        // 🔍 ডেটা ক্যাশিং ভেরিয়েবলস (সার্চের জন্য)
+        let allDonorsDataList = [];
+        let allRequestsDataList = [];
+        let allUsersDataList = [];
+        let allHospitalsDataList = [];
 
         window.alert = function(message) {
             const modal = document.getElementById('admin-custom-alert-modal');
@@ -619,25 +623,39 @@
                     <button onclick="switchAdminTab('ads')" id="tab-btn-ads" class="admin-tab-btn ${isLight ? 'bg-slate-100 text-slate-600' : 'bg-slate-950 text-slate-400'} px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition">📢 বিজ্ঞাপন নিয়ন্ত্রণ (Ads)</button>
                 </div>
 
-                <!-- Tab 1: Donors -->
+                <!-- Tab 1: Donors (সার্চ বার সহ) -->
                 <div id="admin-tab-donors" class="admin-tab-content space-y-3">
-                    <div class="flex justify-between items-center">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                         <h3 class="font-bold text-xs sm:text-sm ${isLight ? 'text-slate-800' : 'text-slate-300'}">রক্তদাতা আবেদন তালিকা:</h3>
-                        <button onclick="loadAdminDonors()" class="text-[11px] ${isLight ? 'bg-slate-200 text-slate-700' : 'bg-slate-800 text-slate-300'} px-2.5 py-1 rounded-lg transition"><i class="fa-solid fa-rotate-right"></i> রিফ্রেশ</button>
+                        <button onclick="loadAdminDonors()" class="text-[11px] ${isLight ? 'bg-slate-200 text-slate-700' : 'bg-slate-800 text-slate-300'} px-2.5 py-1 rounded-lg transition self-end sm:self-auto"><i class="fa-solid fa-rotate-right"></i> রিফ্রেশ</button>
                     </div>
+
+                    <!-- 🔍 রক্তদাতা সার্চ বার -->
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
+                        <input type="text" id="donor-search-input" onkeyup="filterAdminDonorsList(this.value)" placeholder="নাম, রক্তের গ্রুপ, জেলা বা ফোন দিয়ে সার্চ করুন..." class="w-full pl-9 pr-3 py-2.5 ${isLight ? 'bg-white border-slate-200 text-slate-800' : 'bg-slate-950 border-slate-800 text-white'} border rounded-xl text-xs focus:outline-none focus:border-red-500 shadow-sm">
+                    </div>
+
                     <div id="admin-donors-list" class="space-y-3"></div>
                 </div>
 
-                <!-- Tab 2: Requests -->
+                <!-- Tab 2: Requests (সার্চ বার সহ) -->
                 <div id="admin-tab-requests" class="admin-tab-content space-y-3 hidden">
-                    <div class="flex justify-between items-center">
-                        <h3 class="font-bold text-xs sm:text-sm ${isLight ? 'text-slate-800' : 'text-slate-300'}">ফায়ারস্টোর লাইভ রক্তের অনুরোধসমূহ:</h3>
-                        <button onclick="loadAdminRequests()" class="text-[11px] ${isLight ? 'bg-slate-200 text-slate-700' : 'bg-slate-800 text-slate-300'} px-2.5 py-1 rounded-lg transition"><i class="fa-solid fa-rotate-right"></i> রিফ্রেশ</button>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <h3 class="font-bold text-xs sm:text-sm ${isLight ? 'text-slate-800' : 'text-slate-300'}">লাইভ রক্তের অনুরোধসমূহ:</h3>
+                        <button onclick="loadAdminRequests()" class="text-[11px] ${isLight ? 'bg-slate-200 text-slate-700' : 'bg-slate-800 text-slate-300'} px-2.5 py-1 rounded-lg transition self-end sm:self-auto"><i class="fa-solid fa-rotate-right"></i> রিফ্রেশ</button>
                     </div>
+
+                    <!-- 🔍 রক্তের অনুরোধ সার্চ বার -->
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
+                        <input type="text" id="req-search-input" onkeyup="filterAdminRequestsList(this.value)" placeholder="রোগী, হাসপাতাল, রক্তের গ্রুপ বা জেলা দিয়ে সার্চ করুন..." class="w-full pl-9 pr-3 py-2.5 ${isLight ? 'bg-white border-slate-200 text-slate-800' : 'bg-slate-950 border-slate-800 text-white'} border rounded-xl text-xs focus:outline-none focus:border-red-500 shadow-sm">
+                    </div>
+
                     <div id="admin-requests-list" class="space-y-3"></div>
                 </div>
 
-                <!-- Tab 3: Users (সার্চ অপশন ও পারফেক্ট ডিলিট সহ) -->
+                <!-- Tab 3: Users (সার্চ বার সহ) -->
                 <div id="admin-tab-users" class="admin-tab-content space-y-3 hidden">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                         <h3 class="font-bold text-xs sm:text-sm ${isLight ? 'text-slate-800' : 'text-slate-300'}">নিবন্ধিত ব্যবহারকারী নিয়ন্ত্রণ:</h3>
@@ -653,7 +671,7 @@
                     <div id="admin-users-list" class="space-y-3"></div>
                 </div>
 
-                <!-- Tab 4: Hospitals -->
+                <!-- Tab 4: Hospitals (সার্চ বার সহ) -->
                 <div id="admin-tab-hospitals" class="admin-tab-content space-y-4 hidden pb-6">
                     <div class="${isLight ? 'bg-white border-slate-200' : 'bg-slate-950 border-slate-800'} p-4 sm:p-5 rounded-2xl border space-y-3 shadow-sm">
                         <h3 class="font-bold text-xs sm:text-sm ${isLight ? 'text-slate-800' : 'text-white'} flex items-center gap-1.5"><i class="fa-solid fa-circle-plus text-red-600"></i> নতুন হাসপাতাল যোগ করুন</h3>
@@ -666,6 +684,13 @@
                             হাসপাতাল সেভ করুন
                         </button>
                     </div>
+
+                    <!-- 🔍 হাসপাতাল সার্চ বার -->
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
+                        <input type="text" id="hosp-search-input" onkeyup="filterAdminHospitalsList(this.value)" placeholder="হাসপাতালের নাম, লোকেশন বা হটলাইন দিয়ে খুঁজুন..." class="w-full pl-9 pr-3 py-2.5 ${isLight ? 'bg-white border-slate-200 text-slate-800' : 'bg-slate-950 border-slate-800 text-white'} border rounded-xl text-xs focus:outline-none focus:border-red-500 shadow-sm">
+                    </div>
+
                     <div id="admin-hospitals-list" class="space-y-3"></div>
                 </div>
 
@@ -865,60 +890,94 @@
             }
         };
 
+        // ==========================================
+        // ১. রক্তদাতা লোড ও সার্চ মেথড
+        // ==========================================
         window.loadAdminDonors = async function() {
-            let container = document.getElementById('admin-donors-list');
             const isLight = currentTheme === 'light';
             try {
                 const donorsRef = ref(rtdb, 'donors');
                 const snapshot = await get(donorsRef);
-                container.innerHTML = "";
+                allDonorsDataList = [];
                 if(!snapshot.exists()) {
-                    container.innerHTML = `<div class="${isLight ? 'bg-white border-slate-200 text-slate-500' : 'bg-slate-950 border-slate-800 text-slate-500'} p-6 rounded-2xl text-center text-xs border">কোনো ডোনারের আবেদন নেই।</div>`;
+                    document.getElementById('admin-donors-list').innerHTML = `<div class="${isLight ? 'bg-white border-slate-200 text-slate-500' : 'bg-slate-950 border-slate-800 text-slate-500'} p-6 rounded-2xl text-center text-xs border">কোনো ডোনারের আবেদন নেই।</div>`;
                     return;
                 }
                 const data = snapshot.val();
-                let donorEntries = Object.entries(data);
-
-                donorEntries.sort((a, b) => {
-                    if (a[1].status === 'Pending' && b[1].status !== 'Pending') return -1;
-                    if (a[1].status !== 'Pending' && b[1].status === 'Pending') return 1;
-                    return (b[1].timestamp || 0) - (a[1].timestamp || 0);
+                Object.entries(data).forEach(([key, d]) => {
+                    allDonorsDataList.push({ key, ...d });
                 });
 
-                donorEntries.forEach(([key, d]) => {
-                    let isApproved = d.status === 'Approved';
-                    let displayLoc = `${d.upazila ? d.upazila + ', ' : ''}${d.district || ''}`;
-                    let btnApprove = !isApproved ? `<button onclick="approveDonor('${key}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1 shadow"><i class="fa-solid fa-check"></i> অনুমোদন</button>` : '';
-
-                    container.innerHTML += `
-                        <div class="p-3.5 ${isLight ? 'bg-white border-slate-200' : 'bg-slate-950 border-slate-800'} border rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5 text-xs shadow-sm">
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <span class="font-bold ${isLight ? 'text-slate-800' : 'text-white'} text-sm">${d.name}</span>
-                                    <span class="bg-red-500/10 text-red-500 border border-red-500/20 px-2 py-0.5 rounded font-black text-[11px]">${d.group}</span>
-                                    <span class="text-[10px] ${isApproved ? 'text-emerald-500 bg-emerald-500/10' : 'text-amber-500 bg-amber-500/10'} px-2 py-0.5 rounded font-semibold border ${isApproved ? 'border-emerald-500/20' : 'border-amber-500/20'}">
-                                        ${isApproved ? 'অনুমোদিত' : 'পেন্ডিং'}
-                                    </span>
-                                </div>
-                                <p class="text-slate-400 mt-1 text-[11px]">
-                                    <i class="fa-solid fa-phone text-slate-500 mr-1"></i>${d.phone} 
-                                    <span class="mx-1 text-slate-600">|</span> 
-                                    <i class="fa-solid fa-location-dot text-slate-500 mr-1"></i>${displayLoc}
-                                    <span class="mx-1 text-slate-600">|</span> 
-                                    মোট দান: <b class="${isLight ? 'text-slate-700' : 'text-slate-300'}">${d.totalDonated || 0} বার</b>
-                                </p>
-                            </div>
-                            <div class="flex items-center space-x-1.5 self-end sm:self-auto">
-                                ${btnApprove}
-                                <button onclick="deleteDonor('${key}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1 shadow">
-                                    <i class="fa-solid fa-trash-can"></i> ডিলিট
-                                </button>
-                            </div>
-                        </div>
-                    `;
+                // পেন্ডিং আগে দেখাবে
+                allDonorsDataList.sort((a, b) => {
+                    if (a.status === 'Pending' && b.status !== 'Pending') return -1;
+                    if (a.status !== 'Pending' && b.status === 'Pending') return 1;
+                    return (b.timestamp || 0) - (a.timestamp || 0);
                 });
+
+                renderAdminDonorsList(allDonorsDataList);
             } catch(e) {
-                container.innerHTML = '<p class="text-red-500 text-xs text-center py-4">ডোনার লোড করতে ত্রুটি ঘটেছে।</p>';
+                document.getElementById('admin-donors-list').innerHTML = '<p class="text-red-500 text-xs text-center py-4">ডোনার লোড করতে ত্রুটি ঘটেছে।</p>';
+            }
+        };
+
+        function renderAdminDonorsList(list) {
+            let container = document.getElementById('admin-donors-list');
+            const isLight = currentTheme === 'light';
+            container.innerHTML = "";
+
+            if(list.length === 0) {
+                container.innerHTML = `<div class="${isLight ? 'bg-white border-slate-200 text-slate-500' : 'bg-slate-950 border-slate-800 text-slate-500'} p-6 rounded-2xl text-center text-xs border">কোনো রক্তদাতা খুঁজে পাওয়া যায়নি।</div>`;
+                return;
+            }
+
+            list.forEach(d => {
+                let isApproved = d.status === 'Approved';
+                let displayLoc = `${d.upazila ? d.upazila + ', ' : ''}${d.district || ''}`;
+                let btnApprove = !isApproved ? `<button onclick="approveDonor('${d.key}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1 shadow"><i class="fa-solid fa-check"></i> অনুমোদন</button>` : '';
+
+                container.innerHTML += `
+                    <div class="p-3.5 ${isLight ? 'bg-white border-slate-200' : 'bg-slate-950 border-slate-800'} border rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5 text-xs shadow-sm">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold ${isLight ? 'text-slate-800' : 'text-white'} text-sm">${d.name}</span>
+                                <span class="bg-red-500/10 text-red-500 border border-red-500/20 px-2 py-0.5 rounded font-black text-[11px]">${d.group}</span>
+                                <span class="text-[10px] ${isApproved ? 'text-emerald-500 bg-emerald-500/10' : 'text-amber-500 bg-amber-500/10'} px-2 py-0.5 rounded font-semibold border ${isApproved ? 'border-emerald-500/20' : 'border-amber-500/20'}">
+                                    ${isApproved ? 'অনুমোদিত' : 'পেন্ডিং'}
+                                </span>
+                            </div>
+                            <p class="text-slate-400 mt-1 text-[11px]">
+                                <i class="fa-solid fa-phone text-slate-500 mr-1"></i>${d.phone} 
+                                <span class="mx-1 text-slate-600">|</span> 
+                                <i class="fa-solid fa-location-dot text-slate-500 mr-1"></i>${displayLoc}
+                                <span class="mx-1 text-slate-600">|</span> 
+                                মোট দান: <b class="${isLight ? 'text-slate-700' : 'text-slate-300'}">${d.totalDonated || 0} বার</b>
+                            </p>
+                        </div>
+                        <div class="flex items-center space-x-1.5 self-end sm:self-auto">
+                            ${btnApprove}
+                            <button onclick="deleteDonor('${d.key}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1 shadow">
+                                <i class="fa-solid fa-trash-can"></i> ডিলিট
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        window.filterAdminDonorsList = function(query) {
+            query = (query || '').toLowerCase().trim();
+            if(!query) {
+                renderAdminDonorsList(allDonorsDataList);
+            } else {
+                const filtered = allDonorsDataList.filter(d => 
+                    (d.name || '').toLowerCase().includes(query) ||
+                    (d.group || '').toLowerCase().includes(query) ||
+                    (d.phone || '').includes(query) ||
+                    (d.district || '').toLowerCase().includes(query) ||
+                    (d.upazila || '').toLowerCase().includes(query)
+                );
+                renderAdminDonorsList(filtered);
             }
         };
 
@@ -947,39 +1006,73 @@
             });
         };
 
+        // ==========================================
+        // ২. লাইভ রক্তের অনুরোধ লোড ও সার্চ মেথড
+        // ==========================================
         window.loadAdminRequests = async function() {
-            let container = document.getElementById('admin-requests-list');
             const isLight = currentTheme === 'light';
             try {
                 const querySnapshot = await getDocs(collection(db, "bloodRequests"));
-                container.innerHTML = "";
+                allRequestsDataList = [];
                 if(querySnapshot.empty) {
-                    container.innerHTML = `<div class="${isLight ? 'bg-white border-slate-200 text-slate-500' : 'bg-slate-950 border-slate-800 text-slate-500'} p-6 rounded-2xl text-center text-xs border">বর্তমানে কোনো লাইভ অনুরোধ নেই।</div>`;
+                    document.getElementById('admin-requests-list').innerHTML = `<div class="${isLight ? 'bg-white border-slate-200 text-slate-500' : 'bg-slate-950 border-slate-800 text-slate-500'} p-6 rounded-2xl text-center text-xs border">বর্তমানে কোনো লাইভ অনুরোধ নেই।</div>`;
                     return;
                 }
                 querySnapshot.forEach((docSnap) => {
-                    let r = docSnap.data();
-                    let id = docSnap.id;
-                    container.innerHTML += `
-                        <div class="p-3.5 ${isLight ? 'bg-white border-slate-200' : 'bg-slate-950 border-slate-800'} border rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs shadow-sm">
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <span class="font-bold ${isLight ? 'text-slate-800' : 'text-white'} text-sm">${r.name}</span>
-                                    <span class="bg-rose-500/10 text-rose-500 border border-rose-500/20 px-2 py-0.5 rounded font-black text-[11px]">${r.group}</span>
-                                    <span class="text-slate-400 text-[10px]">(${r.bag || 1} ব্যাগ)</span>
-                                </div>
-                                <p class="text-slate-400 mt-1 text-[11px]">
-                                    হাসপাতাল: <b class="${isLight ? 'text-slate-700' : 'text-slate-300'}">${r.hosp}</b>, ${r.district || ''} | ফোন: ${r.phone}
-                                </p>
-                            </div>
-                            <button onclick="deleteRequest('${id}')" class="self-end sm:self-auto bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1 shadow">
-                                <i class="fa-solid fa-trash-can"></i> পোস্ট মুছুন
-                            </button>
-                        </div>
-                    `;
+                    allRequestsDataList.push({ id: docSnap.id, ...docSnap.data() });
                 });
+
+                allRequestsDataList.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                renderAdminRequestsList(allRequestsDataList);
             } catch(e) {
-                container.innerHTML = '<p class="text-red-500 text-xs text-center py-4">অনুরোধ লোড করতে ব্যর্থ।</p>';
+                document.getElementById('admin-requests-list').innerHTML = '<p class="text-red-500 text-xs text-center py-4">অনুরোধ লোড করতে ব্যর্থ।</p>';
+            }
+        };
+
+        function renderAdminRequestsList(list) {
+            let container = document.getElementById('admin-requests-list');
+            const isLight = currentTheme === 'light';
+            container.innerHTML = "";
+
+            if(list.length === 0) {
+                container.innerHTML = `<div class="${isLight ? 'bg-white border-slate-200 text-slate-500' : 'bg-slate-950 border-slate-800 text-slate-500'} p-6 rounded-2xl text-center text-xs border">কোনো রক্তের অনুরোধ পাওয়া যায়নি।</div>`;
+                return;
+            }
+
+            list.forEach(r => {
+                container.innerHTML += `
+                    <div class="p-3.5 ${isLight ? 'bg-white border-slate-200' : 'bg-slate-950 border-slate-800'} border rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs shadow-sm">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold ${isLight ? 'text-slate-800' : 'text-white'} text-sm">${r.name}</span>
+                                <span class="bg-rose-500/10 text-rose-500 border border-rose-500/20 px-2 py-0.5 rounded font-black text-[11px]">${r.group}</span>
+                                <span class="text-slate-400 text-[10px]">(${r.bag || 1} ব্যাগ)</span>
+                            </div>
+                            <p class="text-slate-400 mt-1 text-[11px]">
+                                হাসপাতাল: <b class="${isLight ? 'text-slate-700' : 'text-slate-300'}">${r.hosp}</b>, ${r.district || ''} | ফোন: ${r.phone}
+                            </p>
+                        </div>
+                        <button onclick="deleteRequest('${r.id}')" class="self-end sm:self-auto bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1 shadow">
+                            <i class="fa-solid fa-trash-can"></i> পোস্ট মুছুন
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        window.filterAdminRequestsList = function(query) {
+            query = (query || '').toLowerCase().trim();
+            if(!query) {
+                renderAdminRequestsList(allRequestsDataList);
+            } else {
+                const filtered = allRequestsDataList.filter(r => 
+                    (r.name || '').toLowerCase().includes(query) ||
+                    (r.group || '').toLowerCase().includes(query) ||
+                    (r.hosp || '').toLowerCase().includes(query) ||
+                    (r.district || '').toLowerCase().includes(query) ||
+                    (r.phone || '').includes(query)
+                );
+                renderAdminRequestsList(filtered);
             }
         };
 
@@ -997,15 +1090,16 @@
             });
         };
 
-        // 🌟 ইউজার ডেটা লোড ও সার্চ ক্যাশিং
+        // ==========================================
+        // ৩. ইউজার লোড ও সার্চ মেথড (Cascade Delete)
+        // ==========================================
         window.loadAdminUsers = async function() {
-            let container = document.getElementById('admin-users-list');
             const isLight = currentTheme === 'light';
             try {
                 const snap = await get(ref(rtdb, 'users'));
                 allUsersDataList = [];
                 if(!snap.exists()) {
-                    container.innerHTML = `<div class="${isLight ? 'bg-white border-slate-200 text-slate-500' : 'bg-slate-950 border-slate-800 text-slate-500'} p-6 rounded-2xl text-center text-xs border">কোনো ইউজার তালিকাভুক্ত নেই।</div>`;
+                    document.getElementById('admin-users-list').innerHTML = `<div class="${isLight ? 'bg-white border-slate-200 text-slate-500' : 'bg-slate-950 border-slate-800 text-slate-500'} p-6 rounded-2xl text-center text-xs border">কোনো ইউজার তালিকাভুক্ত নেই।</div>`;
                     return;
                 }
                 const users = snap.val();
@@ -1014,11 +1108,10 @@
                 });
                 renderAdminUsersList(allUsersDataList);
             } catch(e) {
-                container.innerHTML = '<p class="text-red-500 text-xs text-center py-4">ইউজার লোড সমস্যা।</p>';
+                document.getElementById('admin-users-list').innerHTML = '<p class="text-red-500 text-xs text-center py-4">ইউজার লোড সমস্যা।</p>';
             }
         };
 
-        // ইউজার তালিকা রেন্ডার ফাংশন (ব্লক এবং ১০০% পারফেক্ট ডিলিট সহ)
         function renderAdminUsersList(users) {
             let container = document.getElementById('admin-users-list');
             const isLight = currentTheme === 'light';
@@ -1059,7 +1152,6 @@
             });
         }
 
-        // 🔍 লাইভ ইউজার সার্চ ফিল্টার
         window.filterAdminUsersList = function(query) {
             query = (query || '').toLowerCase().trim();
             if(!query) {
@@ -1075,7 +1167,6 @@
             }
         };
 
-        // 🗑️ ফায়ারবেস থেকে ১০০% স্থায়ীভাবে ইউজার মুছে ফেলা (Cascade Delete)
         window.deleteRegisteredUserPermanent = function(phoneKey) {
             showAdminConfirm(
                 'ইউজার চিরতরে ডিলিট!',
@@ -1083,13 +1174,9 @@
                 'হ্যাঁ, চিরতরে মুছুন',
                 async () => {
                     try {
-                        // ১. ইউজার টেবিল থেকে ডিলিট
                         await remove(ref(rtdb, `users/${phoneKey}`));
-
-                        // ২. ওটিপি টেবিল পরিষ্কার
                         await remove(ref(rtdb, `sms_otps/${phoneKey}`));
 
-                        // ৩. ডোনার তালিকা থেকে ওই নম্বরের প্রোফাইল খুঁজে ডিলিট
                         const donorSnap = await get(ref(rtdb, 'donors'));
                         if (donorSnap.exists()) {
                             donorSnap.forEach(child => {
@@ -1121,6 +1208,9 @@
             }
         };
 
+        // ==========================================
+        // ৪. হাসপাতাল লোড ও সার্চ মেথড
+        // ==========================================
         window.addNewHospital = async function() {
             let name = document.getElementById('h-name').value.trim();
             let location = document.getElementById('h-loc').value.trim();
@@ -1145,37 +1235,66 @@
         };
 
         window.loadAdminHospitals = async function() {
-            let container = document.getElementById('admin-hospitals-list');
             const isLight = currentTheme === 'light';
             try {
                 const hospRef = ref(rtdb, 'hospitals');
                 const snapshot = await get(hospRef);
-                container.innerHTML = "";
+                allHospitalsDataList = [];
                 if(!snapshot.exists()) {
-                    container.innerHTML = `<div class="${isLight ? 'bg-white border-slate-200 text-slate-500' : 'bg-slate-950 border-slate-800 text-slate-500'} p-6 rounded-2xl text-center text-xs border">কোনো হাসপাতাল যুক্ত নেই।</div>`;
+                    document.getElementById('admin-hospitals-list').innerHTML = `<div class="${isLight ? 'bg-white border-slate-200 text-slate-500' : 'bg-slate-950 border-slate-800 text-slate-500'} p-6 rounded-2xl text-center text-xs border">কোনো হাসপাতাল যুক্ত নেই।</div>`;
                     return;
                 }
                 const data = snapshot.val();
                 Object.entries(data).forEach(([key, h]) => {
-                    container.innerHTML += `
-                        <div class="p-3.5 ${isLight ? 'bg-white border-slate-200' : 'bg-slate-950 border-slate-800'} border rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs shadow-sm">
-                            <div>
-                                <b class="${isLight ? 'text-slate-800' : 'text-white'} text-sm">${h.name}</b>
-                                <p class="text-slate-400 mt-0.5"><i class="fa-solid fa-location-dot text-red-500 mr-1"></i>${h.location} | <i class="fa-solid fa-phone text-slate-500 mr-1"></i>${h.phone}</p>
-                            </div>
-                            <div class="flex items-center space-x-1.5 self-end sm:self-auto">
-                                <button onclick="openEditHospitalModal('${key}', '${h.name}', '${h.location}', '${h.phone}')" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1">
-                                    <i class="fa-solid fa-pen"></i> এডিট
-                                </button>
-                                <button onclick="deleteHospital('${key}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1">
-                                    <i class="fa-solid fa-trash-can"></i> মুছুন
-                                </button>
-                            </div>
-                        </div>
-                    `;
+                    allHospitalsDataList.push({ key, ...h });
                 });
+                renderAdminHospitalsList(allHospitalsDataList);
             } catch(e) {
-                container.innerHTML = '<p class="text-red-500 text-xs text-center py-4">হাসপাতাল লোড সমস্যা।</p>';
+                document.getElementById('admin-hospitals-list').innerHTML = '<p class="text-red-500 text-xs text-center py-4">হাসপাতাল লোড সমস্যা।</p>';
+            }
+        };
+
+        function renderAdminHospitalsList(list) {
+            let container = document.getElementById('admin-hospitals-list');
+            const isLight = currentTheme === 'light';
+            container.innerHTML = "";
+
+            if(list.length === 0) {
+                container.innerHTML = `<div class="${isLight ? 'bg-white border-slate-200 text-slate-500' : 'bg-slate-950 border-slate-800 text-slate-500'} p-6 rounded-2xl text-center text-xs border">কোনো হাসপাতাল পাওয়া যায়নি।</div>`;
+                return;
+            }
+
+            list.forEach(h => {
+                container.innerHTML += `
+                    <div class="p-3.5 ${isLight ? 'bg-white border-slate-200' : 'bg-slate-950 border-slate-800'} border rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs shadow-sm">
+                        <div>
+                            <b class="${isLight ? 'text-slate-800' : 'text-white'} text-sm">${h.name}</b>
+                            <p class="text-slate-400 mt-0.5"><i class="fa-solid fa-location-dot text-red-500 mr-1"></i>${h.location} | <i class="fa-solid fa-phone text-slate-500 mr-1"></i>${h.phone}</p>
+                        </div>
+                        <div class="flex items-center space-x-1.5 self-end sm:self-auto">
+                            <button onclick="openEditHospitalModal('${h.key}', '${h.name}', '${h.location}', '${h.phone}')" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1">
+                                <i class="fa-solid fa-pen"></i> এডিট
+                            </button>
+                            <button onclick="deleteHospital('${h.key}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1">
+                                <i class="fa-solid fa-trash-can"></i> মুছুন
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        window.filterAdminHospitalsList = function(query) {
+            query = (query || '').toLowerCase().trim();
+            if(!query) {
+                renderAdminHospitalsList(allHospitalsDataList);
+            } else {
+                const filtered = allHospitalsDataList.filter(h => 
+                    (h.name || '').toLowerCase().includes(query) ||
+                    (h.location || '').toLowerCase().includes(query) ||
+                    (h.phone || '').includes(query)
+                );
+                renderAdminHospitalsList(filtered);
             }
         };
 
@@ -1224,6 +1343,9 @@
             });
         };
 
+        // ==========================================
+        // ৫. ডেভেলপার ও বিজ্ঞাপন কন্ট্রোল মেথডস
+        // ==========================================
         window.loadDeveloperInfoInAdmin = async function() {
             try {
                 const devSnap = await get(ref(rtdb, 'developer_info'));
